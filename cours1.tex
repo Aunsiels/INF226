@@ -1,0 +1,128 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage{amsmath}
+
+\begin{document}
+\section{Machine de Turing}
+
+Deux natures de machine, par défaut déterministes.
+On les décrit en deux parties:
+    - dispositif "matériel" : on a une bande, aussi appelée ruban, séparée en cases numérotées. C'est la bande de lecture/écriture. Des symboles peuvent être lus ou écrits dans des cases (par défaut 1 par case). On a ensuite une unité centrale qui va controler la machine de Turing. On a un lien entre l'UC et le ruban appelé tête de lecture/écriture. Un ordinateur est une machine de Turing.
+    - dispositif "logiciel" : il constitué d'un alphabet S qui est un ensemble fini de symboles, d'un ensemble fini d'états E. Ces deux ensembles sont spécifiques à la machine de Turing. On a aussi du fonction de transition delta qui permet de guider le déroulement d'un calcul sur la MT. 
+        delta : E x S -> E x S x \{-1,0,1\}
+	        (e,s) -> delta(e,s)=(e',s',d')
+
+	où :\begin{itemize}
+	    \item[] e = état courant de la MT
+	    \item[] s = symbole contenu dans la case pointée par la tête de lecture/écriture
+	    \item[] e' = nouvel état
+	    \item[] s' = nouveau symbole = symbole écrit par la tête de L/E à la place de s
+	    \item[] d' = déplacement de la tête de L/E avec la convention :
+	    \begin{itemize}
+	        \item[] si -1 alors déplacement d'une case à gauche
+		\item[] si  1 alors déplacement d'une case à droite
+		\item[] si  0 alors pas de déplacement
+	    \end{itemize}
+	\end{itemize}
+
+Un algorithme c'est une instanciation d'une machine de Turing.
+
+Ex : S = \{0,1,b\} où b est le blanc.
+
+delta |    b    |    0    |    1
+-----------------------
+  e1  |(e2,b,-1)|(e1,0,1) |(e1,1,1)
+  e2  |         |(e4,b,-1)|(e3,b,-1)
+  e3  |(e5,b,1) |(e3,b,-1)|(e3,b,-1)
+  e4  |(e5,1,0) |(e4,b,-1)|(e4,b,-1)
+  e5  |(e5,1,0)
+  e6  |(e6,0,0)
+	    
+Convention : à l'instant intial, la tête pointe vers 0. A l'instant initial, la machine de Turing est dans l'état initial, ici e1. (A la fin, la tête pointe de nouveau sur la case 0)
+
+Cet exemple va être un test de parité.
+
+Exercice : Décrire une machine de Turing modélisant la fonction f : f(n) = 2n+1
+
+On admet qu'il est possible de modéliser les opérations suivantes à l'aide de MT :
+    - les quatre opérations arithmétiques appliquée à des entiers relatifs (appartient à Z) : +, -, *, /
+    - et, ou, non
+    - les boucles et les structures d'aiguillages
+    - comparaisons : =, /, <, <=, >, >= pour des entiers relatifs ou pour des caractères.
+
+
+\section{Taille des données}
+    Une instance est l'ensemble des données.
+
+    Soit I une instance d'un certain problème.
+    Soit S fixé.
+    La taille de I, notée |I| est le nombre de symboles de S nécessaires pour décrire I.
+    
+Ex : \begin{enumerate}
+     \item I ets réduite à un entier n.
+        On fixe S=\{0,1,b\}
+	|I| = partie\_entiere\_sup(log2(n+1))
+	    ~ log2(n)
+
+     \item I est un graphe à n sommets codé par sa matrice d'adjacence M.
+        M = (mi,j)(1<=i<=n,1<=j<=n)
+	avec mi,j = 1 si (i,j) existe, 0 sinon
+	|I| = n\^2
+
+     \item I est un graphe orienté G(X,A) à n sommets, complet, pondéré par :
+       p: A -> N
+          a -> p(a)
+       G est codé par la matrice des poids P.
+       P = (pi,j)(1<=i<=n,1<=j<=n)
+       avec pi,j = p(i,j)
+       |I| = sum(part\_ent\_sup(log2(p(i,j)+1)))
+           ~ sum(log2(pi,j))
+    \end{enumerate}
+
+\section{Complexité d'un algorithme}
+    Soit (P) un problème. Soit A un algorithme (=MT) résolvant (P). Soit I une instance quelconque de (P). Appelons pas toute consultation de delta. Soit $f_A(I)$ le nombre de pas effectués par A pour résoudre I. La complexité de A, $c_A$, est la fonction définie par :
+        $c_A : N ->N
+	      n -> c_A(n) = max(f_A(I), |I| = n)$
+
+    Quand on ne précise pas, on exprime la complexité dans le pire des cas.
+
+    En général, on considère le nombre d'opérations élémentaires au lieu du nombre de pas effectués par l'algorithme.
+    Ex: g(x) = 2x+1 -> deux opérations élémentaires
+
+Notation de Landau : O
+    f=O(g) ou f(x) = O(g(x))
+    s'il existe k>0 et N>0 tel que
+        n>=N, |f(n)| <= K|g(n)|
+
+    Ex: si f = 10000 et g = 1, f = O(g)
+
+Définition : un algorithme est dit polynomial si sa complexité est majorable asymptotiquement par un polynôme en la taille des données. Sinon, il est dit exponentiel.
+Définition : Un problème est dit polynomial s'il existe un algorithme polynomial pour le résoudre.
+Ex: \begin{enumerate}
+    \item Trier n entiers
+    \item Primalité. Instance : un entier n (écrit sous forme binaire)
+        Question : n est-il premier ?
+	ATTENTION : (cas sqrt(n)) il n'est pas polynomial car on parle en taille de donnée qui est en log ! Sqrt n'est pas majorable avec un polynôme en log.
+    \item Le problème suivant n'est pas connu pour être polynomial.
+        Nom : Cycle hamiltonien
+	Instance : un graphe G = (X,A), non orienté, codé par sa matrice d'adjacence.
+	Question : existe-t-il un cycle passant exactement 1 fois par chaque sommet de G ?
+    \end{enumerate}
+
+\section{Typologie des problèmes}
+Problème de décision (ou de reconnaissance) : tout problème dans lequel on pose une question dont la réponse est "oui" ou "non".
+Problème d'optimisation combinatoire : problème de la forme Min/max f(x) pour x appartenant à X (supposé fini).On suppose f : X -> N (ou Z ou Q)
+Problème de recherche : on cherche une solution x\up{*} d'un problème d'optimisation. Ex : f(x\up{*}=Max f(x), x appartenant à X.
+
+Liens entre ces problèmes :
+    Soit ($P_O$) un problème d'optimisation :
+        Max f(x) x appartient à X, avec X finie et f : X -> N
+	O lui associe un problème de décision ($P_B$) défini par :
+	    Nom : $P_B$
+	    Instance : X,f; une entier K >= 0 (car f : X -> N)
+	    Question : Existe-t-il x0 appartenant à X tel que $f(x_0) >= K$ ?
+
+\end{document}

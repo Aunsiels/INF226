@@ -1,0 +1,7 @@
+Consider compressing the output of a previous compression (you may use the ‘zip’
+command). Start from any object, for instance some part T of the present text.
+Quite probably, Zn(T) will end up increasing. It is easy to see that either the
+sequence Zn(T) is periodic or one can extract an increasing subsequence from it.
+Indicate the successive compression sizes. Verify that for some n0, Zn0(T) >
+length(T). 
+(give the values)
